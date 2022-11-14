@@ -1,0 +1,4 @@
+scrapy
+selenium
+webdriver-manager
+zope.sqlalchemy
