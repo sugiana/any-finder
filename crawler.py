@@ -19,6 +19,10 @@ class Product(Item):
     description = Field()
     image = Field()
     url = Field()
+    shop_name = Field()
+    shop_url = Field()
+    city = Field()
+    stock = Field()
 
 
 class Crawler(Spider):
@@ -47,8 +51,9 @@ class Crawler(Spider):
                     self.set_hostname(filename)
                 else:
                     self.start_urls = [product_url]
-                    tmp_dir = os.path.split(filename)[0]
-                    self.set_hostname(tmp_dir)
+                    if not hostname:
+                        tmp_dir = os.path.split(filename)[0]
+                        self.set_hostname(tmp_dir)
             else:
                 self.start_urls = [product_url]
         elif hostname:

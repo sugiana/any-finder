@@ -1,3 +1,4 @@
+import json
 from urllib.parse import (
     urlparse,
     quote,
@@ -17,11 +18,25 @@ XPATH_PRICE_DISC = '//div[contains(@class,"c-product-price -discounted")]'\
 XPATH_PRICE_ORIG = '//div[contains(@class,"c-product-price -original")]'\
                    '/span/text()'
 XPATH_IMAGE = '//meta[@property="og:image"]/@content'
+XPATH_JSON = '//script[@type="application/ld+json"]/text()'
+XPATH_SHOP_URL = '//a[@class="c-avatar"]/@href'
+XPATH_CITY = '//a[contains(@class,"c-seller__city")]/text()'
+XPATH_EMPTY = '//div[@class="c-main-product__unavailable"]'
 
 
 class Parser(BaseParser):
     XPATH_INFO = '//table[@class="c-information__table"]/tbody/tr'
     XPATH_DESC = '//div[@class="c-information__description-txt"]'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.meta = dict()
+        for xs in self.response.xpath(XPATH_JSON):
+            s = xs.extract()
+            d = json.loads(s)
+            if d['@type'] == 'Product':
+                self.meta = d
+                break
 
     @classmethod
     def start_url(self, keywords):
@@ -66,12 +81,27 @@ class Parser(BaseParser):
     def get_title(self) -> str:  # Override
         return self.response.xpath(XPATH_TITLE).extract()[0]
 
-    def get_price(self) -> str:  # Override
+    def get_price(self) -> float:  # Override
         xs = self.response.xpath(XPATH_PRICE_DISC)
         if not xs:
             xs = self.response.xpath(XPATH_PRICE_ORIG)
         v = xs.extract()[0]
-        return v.lstrip('Rp').replace('.', '')
+        v = v.lstrip('Rp').replace('.', '')
+        return float(v)
 
     def get_image(self) -> str:  # Override
         return self.response.xpath(XPATH_IMAGE).extract()[0]
+
+    def get_shop_name(self) -> str:
+        return self.meta['offers']['seller']['name']
+
+    def get_shop_url(self) -> str:
+        return self.response.xpath(XPATH_SHOP_URL).extract()[0]
+
+    def get_city(self) -> str:
+        return self.response.xpath(XPATH_CITY).extract()[0]
+
+    def get_stock(self) -> int:
+        if self.response.xpath(XPATH_EMPTY):
+            return 0
+        return 1

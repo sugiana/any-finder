@@ -59,6 +59,10 @@ class Parser:
         d['title'] = self.get_title()
         d['price'] = self.get_price()
         d['image'] = self.get_image()
+        d['shop_name'] = self.get_shop_name()
+        d['shop_url'] = self.get_shop_url()
+        d['city'] = self.get_city()
+        d['stock'] = self.get_stock()
         if isinstance(self.XPATH_DESC, str):
             xs = self.response.xpath(self.XPATH_DESC)
             s = xs.extract()[0]

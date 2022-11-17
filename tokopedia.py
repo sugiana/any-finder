@@ -10,8 +10,6 @@ from parser import Parser as BaseParser
 
 
 XPATH_PRODUCT = '//div[contains(@data-testid,"divProductWrapper")]//a'
-XPATH_NEXT = '//button[@aria-label="Laman berikutnya"]'
-XPATH_IMAGE = '//meta[@property="og:image"]/@content'
 
 
 class Crawler:
@@ -66,6 +64,10 @@ class Crawler:
 XPATH_TITLE = '//h1/text()'
 XPATH_PRICE = '//div[@class="price"]/text()'
 XPATH_URL = '//meta[contains(@name,"desktop_url")]/@content'
+XPATH_IMAGE = '//meta[@property="og:image"]/@content'
+XPATH_SHOP_NAME = '//a[@data-testid="llbPDPFooterShopName"]/h2/text()'
+XPATH_CITY = '//h2[contains(@data-unify,"Typography")]/b/text()'
+XPATH_STOCK = '//p[@data-testid="stock-label"]/b/text()'
 
 
 class Parser(BaseParser):
@@ -75,12 +77,29 @@ class Parser(BaseParser):
     def get_title(self) -> str:  # Override
         return self.response.xpath(XPATH_TITLE).extract()[0]
 
-    def get_price(self) -> str:  # Override
+    def get_price(self) -> float:  # Override
         s = self.response.xpath(XPATH_PRICE).extract()[0].lstrip('Rp')
-        return s.replace('.', '')
+        return float(s.replace('.', ''))
 
     def get_url(self) -> str:  # Override
         return self.response.xpath(XPATH_URL).extract()[0]
 
     def get_image(self) -> str:  # Override
         return self.response.xpath(XPATH_IMAGE).extract()[0]
+
+    def get_shop_name(self) -> str:
+        return self.response.xpath(XPATH_SHOP_NAME).extract()[0]
+
+    def get_shop_url(self) -> str:
+        product_url = self.get_url()
+        p = urlparse(product_url)
+        return 'https://www.tokopedia.com/' + p.path.split('/')[1]
+
+    def get_city(self) -> str:
+        s = self.response.xpath(XPATH_CITY).extract()
+        if s:
+            return s[0]
+
+    def get_stock(self) -> int:
+        t = self.response.xpath(XPATH_STOCK).extract()
+        return int(t[-1].replace('Sisa ', ''))

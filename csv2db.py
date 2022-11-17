@@ -3,6 +3,7 @@ from logging import getLogger
 from configparser import ConfigParser
 from argparse import ArgumentParser
 from datetime import datetime
+from urllib.parse import urlparse
 import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -38,12 +39,17 @@ register(db_session)
 
 df = pd.read_csv(option.csv_file)
 base_q = db_session.query(Product)
-update_fields = ('title', 'price', 'description', 'image')
+update_fields = (
+    'title', 'price', 'description', 'image', 'shop_name', 'shop_url', 'city',
+    'hostname', 'stock')
 for i in df.index:
     url = df['url'][i]
+    p = urlparse(url)
     source = dict(
             url=url, title=df['title'][i], price=float(df['price'][i]),
-            description=df['description'][i], image=df['image'][i])
+            description=df['description'][i], image=df['image'][i],
+            shop_name=df['shop_name'][i], shop_url=df['shop_url'][i],
+            city=df['city'][i], hostname=p.netloc, stock=int(df['stock'][i]))
     q = base_q.filter_by(url=url)
     p = q.first()
     target_update = dict()
