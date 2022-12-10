@@ -5,6 +5,7 @@ from argparse import ArgumentParser
 from datetime import datetime
 from urllib.parse import urlparse
 import pandas as pd
+import numpy as np
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from zope.sqlalchemy import register
@@ -38,6 +39,7 @@ db_session = factory()
 register(db_session)
 
 df = pd.read_csv(option.csv_file)
+df = df.replace(np.nan, None, regex=True)
 base_q = db_session.query(Product)
 update_fields = (
     'title', 'price', 'description', 'image', 'shop_name', 'shop_url', 'city',

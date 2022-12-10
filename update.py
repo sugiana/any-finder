@@ -70,7 +70,8 @@ register(db_session)
 
 tgl = datetime.now() - timedelta(30)
 
-q = db_session.query(Product).filter(Product.updated < tgl)
+q = db_session.query(Product)
+q = q.filter(Product.updated < tgl)
 for product in q:
     p = urlparse(product.url)
     if p.netloc in use_scrapy:

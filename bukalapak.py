@@ -11,8 +11,9 @@ from parser import Parser as BaseParser
 
 QSTRING_KEY = quote('search[keywords]')
 XPATH_TITLE = '//h1/text()'
-XPATH_PRODUCT = '//div[contains(@class,"bl-flex-container flex-wrap is-gutter-16")]'\
-                '/div[contains(@class,"bl-flex-item")]'
+XPATH_PRODUCT = \
+        '//div[contains(@class,"bl-flex-container flex-wrap is-gutter-16")]'\
+        '/div[contains(@class,"bl-flex-item")]'
 XPATH_PRICE_DISC = '//div[contains(@class,"c-product-price -discounted")]'\
                    '/span/text()'
 XPATH_PRICE_ORIG = '//div[contains(@class,"c-product-price -original")]'\
